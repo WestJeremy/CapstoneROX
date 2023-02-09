@@ -29,30 +29,34 @@ class Spiral:
     
 
 class Intensity:
-    def __init__(self,x0:float,y0:float):
+    def __init__(self,x0:float,y0:float, mu_x, mu_y, sigma_x, sigma_y):
         self.x0=x0 #x offset
         self.y0=y0 #y offset
-    def get(self,x,y):
+        self.mu_x=mu_x
+        self.mu_y=mu_y
+        self.sigma_x=sigma_x
+        self.sigma_y=sigma_y
         
-        R = np.array(np.sqrt((x-self.x0)**2 + (y-self.y0)**2));
-        Int = np.sin(R)*100;
-        return Int
+        
+    def get(self,x, y):
+        I=np.exp(-0.5 * (((x +self.x0- self.mu_x) / self.sigma_x)**2 + ((y+self.y0 - self.mu_y) / self.sigma_y)**2))
+        return I
+
+        
 
 if __name__=="__main__":
     print('Calling spiral from class')
 
-    cur_spiral=Spiral(0,0,10)
+    cur_spiral=Spiral(0,0,100)
     x,y=cur_spiral.build(50,10)
     
     
     X = np.arange(-5, 5, 0.1)
     Y = np.arange(-5, 5, 0.1)
     
-    TestInt=Intensity(.1,.2)
-    I=TestInt.get(3,4)
-    
-    I=TestInt.get(X,Y)
-    print('The intensity is',I)        
+    TestInt=Intensity(.1,.2,0,0,1,1)
+    I=TestInt.get(x,y)
+    #print('The intensity is',I)        
     
     #print(cur_spiral.build(50,10))
     plt.plot(x, y, color = 'red', marker = "o") 
@@ -60,7 +64,8 @@ if __name__=="__main__":
     plt.show()
 
 
-# for i in range(len(x)):
-#     coord=(x[i],y[i],0)
-#     print(coord)
-#     print('')
+for i in range(len(x)):
+    coord=(x[i],y[i],0)
+    Ic=TestInt.get(x[i],y[i])
+    print('moved to:'+str(coord)+'Intensity is: '+str(Ic))
+    print('')
