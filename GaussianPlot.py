@@ -16,7 +16,7 @@ x = np.linspace(-5, 5, 100)
 y = np.linspace(-5, 5, 100)
 
 X, Y = np.meshgrid(x, y)
-Z = gaussian(X, Y, 0, 0, 1, 1)
+Z = gaussian(X, Y, 0, 0, 2, 1)
 
 fig = plt.figure()
 ax = fig.add_subplot(111, projection='3d')

@@ -4,12 +4,14 @@ Created on Thu Jan 19 18:43:18 2023
 
 @author: westj
 """
-from robodk.robolink import *       # import the robolink library (bridge with RoboDK)
-RDK = Robolink()   
-from robodk.robomath import *   
+# from robodk.robolink import *       # import the robolink library (bridge with RoboDK)
+# RDK = Robolink()   
+# from robodk.robomath import *   
 import math
 import numpy as np
 import matplotlib.pyplot as plt 
+import array
+import pandas as pd
 
 class Spiral:
     def __init__(self,x0:float,y0:float,points:float) -> None:
@@ -22,23 +24,23 @@ class Spiral:
         k=spacing/(2*np.pi)                       
         theta=np.array(np.linspace(0,revs*2*np.pi,self.points)) #how many points and angle coord
         r=k * theta                       #radius coord
-        x=(r*np.cos(theta)+self.x0)
-        y=(r*np.sin(theta)+self.y0)             #convert to y cartesian
+        x=(r*np.cos(theta)+self.x0)       #convert to x cartesian
+        y=(r*np.sin(theta)+self.y0)       #convert to y cartesian
         
-        return x, y #convert to x cartesian
+        return x, y 
     
 
-class Intensity:
+class Intensity: #intensity function is a gaussian curve 
     def __init__(self,x0:float,y0:float, mu_x, mu_y, sigma_x, sigma_y):
         self.x0=x0 #x offset
         self.y0=y0 #y offset
         self.mu_x=mu_x
         self.mu_y=mu_y
-        self.sigma_x=sigma_x
-        self.sigma_y=sigma_y
+        self.sigma_x=sigma_x #x squish/stretch
+        self.sigma_y=sigma_y #y sqush/stretch
         
         
-    def get(self,x, y):
+    def get(self,x, y): #gaussian curve definition
         I=np.exp(-0.5 * (((x +self.x0- self.mu_x) / self.sigma_x)**2 + ((y+self.y0 - self.mu_y) / self.sigma_y)**2))
         return I
 
@@ -47,25 +49,62 @@ class Intensity:
 if __name__=="__main__":
     print('Calling spiral from class')
 
-    cur_spiral=Spiral(0,0,100)
-    x,y=cur_spiral.build(50,10)
+    cur_spiral=Spiral(0,0,100) #setting params of the spiral we will be using
+    x,y=cur_spiral.build(3,.75) #build our spiral x y coords
     
     
-    X = np.arange(-5, 5, 0.1)
-    Y = np.arange(-5, 5, 0.1)
+    TestInt=Intensity(.1,.2,0,0,2,1) #set test intensity parameters     
     
-    TestInt=Intensity(.1,.2,0,0,1,1)
-    I=TestInt.get(x,y)
-    #print('The intensity is',I)        
-    
-    #print(cur_spiral.build(50,10))
+    #Plot our spiral
     plt.plot(x, y, color = 'red', marker = "o") 
     plt.axis('equal')
     plt.show()
+    
 
+X=[]
+Y=[]
+Z=[]
+Iv=[]
+Cv=[]
 
 for i in range(len(x)):
     coord=(x[i],y[i],0)
+    X.append(x[i])
+    Y.append(y[i])
+    Z.append(0)
     Ic=TestInt.get(x[i],y[i])
-    print('moved to:'+str(coord)+'Intensity is: '+str(Ic))
-    print('')
+    Iv.append(np.array(Ic))
+    
+titled_columns={'X': X,'Y': Y,'Z': Z,
+                'Intensity': Iv}
+
+data = pd.DataFrame(titled_columns)
+
+dp=np.array(np.sqrt(np.diff(data['X'])**2+(np.diff(data['Y'])**2))) #change in position from previous point
+    
+np.meshgrid()
+fig = plt.figure()
+ax = fig.add_subplot(111, projection='3d')
+ax.plot3D(data['X'], data['Y'], data['Intensity'])
+
+ax.set_xlabel('X axis')
+ax.set_ylabel('Y axis')
+ax.set_zlabel('Z axis')
+
+plt.show()
+
+dp=np.insert(dp,0,1) #placeholder to make sizes match
+data['dp']=dp
+
+
+dI=np.diff(data['Intensity'])
+dI=np.insert(dI,0,0)
+data['dI']=dI
+
+
+data['dI/dp']=data['dI']/data['dp']
+
+print(data)
+print(data['Intensity'][3])
+
+    
