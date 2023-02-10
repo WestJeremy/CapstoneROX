@@ -12,6 +12,7 @@ import numpy as np
 import matplotlib.pyplot as plt 
 import array
 import pandas as pd
+from scipy.signal import find_peaks
 
 class Spiral:
     def __init__(self,x0:float,y0:float,points:float) -> None:
@@ -60,14 +61,14 @@ if __name__=="__main__":
     plt.axis('equal')
     plt.show()
     
-
+#initialize params
 X=[]
 Y=[]
 Z=[]
 Iv=[]
 Cv=[]
 
-for i in range(len(x)):
+for i in range(len(x)): #loop to get coord and corresponding intensity
     coord=(x[i],y[i],0)
     X.append(x[i])
     Y.append(y[i])
@@ -75,36 +76,50 @@ for i in range(len(x)):
     Ic=TestInt.get(x[i],y[i])
     Iv.append(np.array(Ic))
     
+#pandas dictionary
 titled_columns={'X': X,'Y': Y,'Z': Z,
                 'Intensity': Iv}
-
 data = pd.DataFrame(titled_columns)
 
-dp=np.array(np.sqrt(np.diff(data['X'])**2+(np.diff(data['Y'])**2))) #change in position from previous point
-    
-np.meshgrid()
+# dI=np.diff(data['Intensity'])
+# dI=np.insert(dI,0,-1)
+# data['dI']=dI
+
+# dp=np.array(np.sqrt(np.diff(data['X'])**2+(np.diff(data['Y'])**2))) #change in position from previous point
+# dp=np.insert(dp,0,1) #placeholder to make sizes match
+# data['dp']=dp
+
+# data['dI/dp']=data['dI']/data['dp']
+
+#Plotting
 fig = plt.figure()
 ax = fig.add_subplot(111, projection='3d')
+peaks = find_peaks(data['Intensity'], height=.1)
+height=peaks[1]
+peakpos=peaks[0]
+
 ax.plot3D(data['X'], data['Y'], data['Intensity'])
+ax.plot3D(data['X'][peaks], data['Y'][peaks], data['Intensity'][peaks],"x")
 
 ax.set_xlabel('X axis')
 ax.set_ylabel('Y axis')
 ax.set_zlabel('Z axis')
-
 plt.show()
 
-dp=np.insert(dp,0,1) #placeholder to make sizes match
-data['dp']=dp
+
+# Ipks=data['Intensity'][peaks]
+
+# ii=np.sort(Ipks)
 
 
-dI=np.diff(data['Intensity'])
-dI=np.insert(dI,0,0)
-data['dI']=dI
+
+#IpksS=Ipks[:,2].sort(reverse=True)
+m=max(data['Intensity'])
+print(np.where(data['Intensity'] == m)[0])
+#rint(ii)
 
 
-data['dI/dp']=data['dI']/data['dp']
 
 print(data)
 print(data['Intensity'][3])
 
-    
