@@ -4,8 +4,8 @@ Created on Thu Jan 19 18:43:18 2023
 
 @author: westj
 """
-# from robodk.robolink import *       # import the robolink library (bridge with RoboDK)
-# RDK = Robolink()   
+#from robodk.robolink import *       # import the robolink library (bridge with RoboDK)
+#RDK = Robolink()   
 # from robodk.robomath import *   
 import math
 import numpy as np
@@ -91,15 +91,24 @@ data = pd.DataFrame(titled_columns)
 
 # data['dI/dp']=data['dI']/data['dp']
 
+
+
+
+peaks= find_peaks(data['Intensity'], height=.1)
+IPeaks=peaks[0]
+H=peaks[1]['peak_heights']
+A=[]
+for i in range(len(IPeaks)):
+    corr=[IPeaks[i],H[i]]
+    A.append(corr)
+SA=sorted(A, key=lambda x: x[1], reverse=True) #sort by peak height largest to smallest
+
+
 #Plotting
 fig = plt.figure()
 ax = fig.add_subplot(111, projection='3d')
-peaks = find_peaks(data['Intensity'], height=.1)
-height=peaks[1]
-peakpos=peaks[0]
-
 ax.plot3D(data['X'], data['Y'], data['Intensity'])
-ax.plot3D(data['X'][peaks], data['Y'][peaks], data['Intensity'][peaks],"x")
+ax.plot3D(data['X'][IPeaks], data['Y'][IPeaks], data['Intensity'][IPeaks],"x")
 
 ax.set_xlabel('X axis')
 ax.set_ylabel('Y axis')
