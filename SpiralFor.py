@@ -72,91 +72,98 @@ class Intensity: #intensity function is a gaussian curve
 
         
 #*****************************************************************************************************************
-if __name__=="__main__":
-    print('Calling spiral from class')
+xl=0
+yl=0
+for L in range(1,3):
+    print(L)
+    if __name__=="__main__":
+        print('Calling spiral from class')
 
-    cur_spiral=Spiral(0,0,200) #setting params of the spiral we will be using
-    x,y=cur_spiral.build(3,1) #build our spiral x y coords
-    Ix=1.24
-    Iy=-2.3
-    TestInt=Intensity(Ix,Iy,0,0,2,1) #set test intensity parameters     
+        cur_spiral=Spiral(xl,yl,200) #setting params of the spiral we will be using
+        x,y=cur_spiral.build(3/L**2,1/L**2) #build our spiral x y coords
+        Ix=1.24
+        Iy=-2.3
+        TestInt=Intensity(Ix,Iy,0,0,2,1) #set test intensity parameters     
     
-    #Plot our spiral
-    plt.plot(x, y, color = 'red', marker = "o") 
-    plt.axis('equal')
-    plt.show()
+        #Plot our spiral
+        plt.plot(x, y, color = 'red', marker = "o") 
+        plt.axis('equal')
+        plt.show()
     
-#initialize params
-X=[]
-Y=[]
-Z=[]
-Iv=[]
-Cv=[]
+    #initialize params
+    X=[]
+    Y=[]
+    Z=[]
+    Iv=[]
+    Cv=[]
+    
+    for i in range(len(x)): #loop to get coord and corresponding intensity
+        coord=(x[i],y[i],0)
+        X.append(x[i])
+        Y.append(y[i])
+        Z.append(0)
+        Ic=TestInt.get(x[i],y[i])
+        Iv.append(np.array(Ic))
+        
+        #pandas dictionary
+        titled_columns={'X': X,'Y': Y,'Z': Z,
+                        'Intensity': Iv}
+        data = pd.DataFrame(titled_columns)
 
-for i in range(len(x)): #loop to get coord and corresponding intensity
-    coord=(x[i],y[i],0)
-    X.append(x[i])
-    Y.append(y[i])
-    Z.append(0)
-    Ic=TestInt.get(x[i],y[i])
-    Iv.append(np.array(Ic))
-    
-#pandas dictionary
-titled_columns={'X': X,'Y': Y,'Z': Z,
-                'Intensity': Iv}
-data = pd.DataFrame(titled_columns)
 
-
-peaks= find_peaks(data['Intensity'], height=.1)
-IPeaks=peaks[0]
-H=peaks[1]['peak_heights']
-A=[]
-for i in range(len(IPeaks)):
-    corr=[IPeaks[i],H[i]]
-    A.append(corr)
-    
+    peaks= find_peaks(data['Intensity'], height=.1)
+    IPeaks=peaks[0]
+    H=peaks[1]['peak_heights']
+    A=[]
+    for i in range(len(IPeaks)):
+        corr=[IPeaks[i],H[i]]
+        A.append(corr)
+        
  
     
-SA=sorted(A, key=lambda x: x[1], reverse=True) #sort by peak height largest to smallest
+    SA=sorted(A, key=lambda x: x[1], reverse=True) #sort by peak height largest to smallest
 
 
-CL=Linear(data,3) #current linear line definition
+    CL=Linear(data,3) #current linear line definition
 
-step=.01 #linear step size
-xl=data['X'][SA[0][0]] #start x
-yl=CL.get(xl) #start y
+    step=.1/L #linear step size
+    xl=data['X'][SA[0][0]] #start x
+    yl=CL.get(xl) #start y
 
-Xl=[xl]  
-Yl=[yl]
-Il=[TestInt.get(xl,yl)]
+    Xl=[xl]  
+    Yl=[yl]
+    Il=[TestInt.get(xl,yl)]
 
-if  data['X'][SA[0][0]] < data['X'][SA[1][0]]: 
-    step=step
-else:
-    step=-step
+    if  data['X'][SA[0][0]] < data['X'][SA[1][0]]: 
+        step=step
+    else:
+        step=-step
     
     
-while TestInt.get(xl+step,CL.get(xl+step)) >= TestInt.get(xl,CL.get(xl)):
-    xl=xl+step
-    yl=CL.get(xl)
-    il=TestInt.get(xl,yl)
-    Xl.append(xl)
-    Yl.append(yl)
-    Il.append(il)
+    while TestInt.get(xl+step,CL.get(xl+step)) >= TestInt.get(xl,CL.get(xl)):
+        xl=xl+step
+        yl=CL.get(xl)
+        il=TestInt.get(xl,yl)
+        Xl.append(xl)
+        Yl.append(yl)
+        Il.append(il)
 
 
-LLdata={'X':Xl,'Y':Yl,'I':Il}
-Ldata=pd.DataFrame(LLdata)
-fig = plt.figure()
-ax = fig.add_subplot(111, projection='3d')
-ax.plot3D(data['X'], data['Y'], data['Intensity'])
-ax.plot3D(data['X'][IPeaks], data['Y'][IPeaks], data['Intensity'][IPeaks],"x")
-ax.plot3D(Xl, Yl, Il,'o')
+    LLdata={'X':Xl,'Y':Yl,'I':Il}
+    Ldata=pd.DataFrame(LLdata)
+    fig = plt.figure()
+    ax = fig.add_subplot(111, projection='3d')
+    ax.plot3D(data['X'], data['Y'], data['Intensity'])
+    ax.plot3D(data['X'][IPeaks], data['Y'][IPeaks], data['Intensity'][IPeaks],"x")
+    ax.plot3D(Xl, Yl, Il,'o')
 
-ax.set_xlabel('X axis')
-ax.set_ylabel('Y axis')
-ax.set_zlabel('Z axis')
-plt.show()    
+    ax.set_xlabel('X axis')
+    ax.set_ylabel('Y axis')
+    ax.set_zlabel('Z axis')
+    plt.show()    
+
+
+
 
 E=np.sqrt((Ix-xl)**2+(Iy-yl)**2)
 print('***Linear Translation********************************************************')
