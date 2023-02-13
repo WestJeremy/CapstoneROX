@@ -4,9 +4,9 @@ Created on Thu Jan 19 18:43:18 2023
 
 @author: westj
 """
-#from robodk.robolink import *       # import the robolink library (bridge with RoboDK)
-#RDK = Robolink()   
-# from robodk.robomath import *   
+from robodk.robolink import *       # import the robolink library (bridge with RoboDK)
+RDK = Robolink()   
+from robodk.robomath import *   
 import math
 import numpy as np
 import matplotlib.pyplot as plt 
@@ -85,7 +85,7 @@ for L in range(1,Loops+1):
         x,y=cur_spiral.build(3/L**L,.75**L) #build our spiral x y coords
         Ix=1.24
         Iy=-2.3
-        TestInt=Intensity(Ix,Iy,0,0,2,1) #set test intensity parameters     
+        TestInt=Intensity(Ix,Iy,0,0,20,20) #set test intensity parameters     
     
         #Plot our spiral
         # plt.plot(x, y, color = 'red', marker = "o") 
