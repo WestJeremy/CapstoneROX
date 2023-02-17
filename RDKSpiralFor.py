@@ -85,7 +85,8 @@ for L in range(1,Loops+1):
         x,y=cur_spiral.build(3/L**L,.75**L) #build our spiral x y coords
         Ix=1.24
         Iy=-2.3
-        TestInt=Intensity(Ix,Iy,0,0,20,20) #set test intensity parameters     
+        TestInt=Intensity(Ix,Iy,0,0,20,20) #set test intensity parameters   
+        TestInt2=Intensity(Ix+3,Iy,0,0,2,50) #set test intensity parameters   
     
         #Plot our spiral
         # plt.plot(x, y, color = 'red', marker = "o") 
@@ -145,7 +146,7 @@ for L in range(1,Loops+1):
     while TestInt.get(xl+step,CL.get(xl+step)) >= TestInt.get(xl,CL.get(xl)):
         xl=xl+step
         yl=CL.get(xl)
-        il=TestInt.get(xl,yl)
+        il=TestInt2.get(xl,yl)
         Xl.append(xl)
         Yl.append(yl)
         Il.append(il)
