@@ -12,6 +12,8 @@ import numpy as np
 import matplotlib.pyplot as plt 
 import array
 import pandas as pd
+import requests
+import re
 from scipy.signal import find_peaks
 from scipy.stats import linregress
 
@@ -71,7 +73,21 @@ class Intensity: #intensity function is a gaussian curve
         I=np.exp(-0.5 * (((x +self.x0- self.mu_x) / self.sigma_x)**2 + ((y+self.y0 - self.mu_y) / self.sigma_y)**2))
         return I
 
-        
+class Photoresistor:
+    def __init__(self,url) -> None:
+        self.url=url
+    def get(self):
+        response = requests.get(self.url)
+        if response.ok:
+            value = response.text
+            PR=re.findall(r'\d+',value)
+            print('Received value:', value)
+            print('Number', PR)
+        else:
+            print('Error:', response.status_code)   
+            return PR
+
+
 #*****************************************************************************************************************
 xl=0
 yl=0
@@ -86,7 +102,8 @@ for L in range(1,Loops+1):
         Ix=1.24
         Iy=-2.3
         TestInt=Intensity(Ix,Iy,0,0,20,20) #set test intensity parameters   
-        TestInt2=Intensity(Ix+3,Iy,0,0,2,50) #set test intensity parameters   
+        TestInt2=Intensity(Ix+3,Iy,0,0,2,50) #set test intensity parameters 
+        PR=Photoresistor( 'http://192.168.0.24')
     
         #Plot our spiral
         # plt.plot(x, y, color = 'red', marker = "o") 
@@ -106,6 +123,7 @@ for L in range(1,Loops+1):
         Y.append(y[i])
         Z.append(0)
         Ic=TestInt.get(x[i],y[i])
+        Ic=PR.get()
         Iv.append(np.array(Ic))
         
         #pandas dictionary
@@ -146,7 +164,7 @@ for L in range(1,Loops+1):
     while TestInt.get(xl+step,CL.get(xl+step)) >= TestInt.get(xl,CL.get(xl)):
         xl=xl+step
         yl=CL.get(xl)
-        il=TestInt2.get(xl,yl)
+        il=PR.get()
         Xl.append(xl)
         Yl.append(yl)
         Il.append(il)

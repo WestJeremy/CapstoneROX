@@ -158,6 +158,9 @@ ax.set_ylabel('Y axis')
 ax.set_zlabel('Z axis')
 plt.show()    
 
+
+
+
 E=np.sqrt((Ix-xl)**2+(Iy-yl)**2)
 print('***Linear Translation********************************************************')
 print(Ldata)
