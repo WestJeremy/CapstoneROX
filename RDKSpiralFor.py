@@ -91,7 +91,7 @@ class Photoresistor:
 #*****************************************************************************************************************
 xl=0
 yl=0
-Loops=2
+Loops=3
 for L in range(1,Loops+1):
     print(L)
     if __name__=="__main__":
@@ -99,10 +99,10 @@ for L in range(1,Loops+1):
 
         cur_spiral=Spiral(xl,yl,200) #setting params of the spiral we will be using
         x,y=cur_spiral.build(3/L**L,.75**L) #build our spiral x y coords
-        Ix=1.24
-        Iy=-2.3
-        TestInt=Intensity(Ix,Iy,0,0,20,20) #set test intensity parameters   
-        TestInt2=Intensity(Ix+3,Iy,0,0,2,50) #set test intensity parameters 
+        Ix=5
+        Iy=5
+        TestInt=Intensity(Ix,Iy,0,0,3,3) #set test intensity parameters   
+        TestInt2=Intensity(Ix,Iy,0,0,2,50) #set test intensity parameters 
         PR=Photoresistor( 'http://192.168.0.24')
     
         #Plot our spiral
@@ -123,7 +123,7 @@ for L in range(1,Loops+1):
         Y.append(y[i])
         Z.append(0)
         Ic=TestInt.get(x[i],y[i])
-        Ic=PR.get()
+        #Ic=PR.get()
         Iv.append(np.array(Ic))
         
         #pandas dictionary
@@ -137,7 +137,7 @@ for L in range(1,Loops+1):
     H=peaks[1]['peak_heights']
     A=[]
     for i in range(len(IPeaks)):
-        corr=[IPeaks[i],H[i]]
+        corr=[IPeaks[i],H[i]] 
         A.append(corr)
         
  
@@ -164,7 +164,8 @@ for L in range(1,Loops+1):
     while TestInt.get(xl+step,CL.get(xl+step)) >= TestInt.get(xl,CL.get(xl)):
         xl=xl+step
         yl=CL.get(xl)
-        il=PR.get()
+        il=TestInt.get(xl,yl)
+        #il=PR.get()
         Xl.append(xl)
         Yl.append(yl)
         Il.append(il)
